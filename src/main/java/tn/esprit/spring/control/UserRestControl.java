@@ -1,4 +1,6 @@
 package tn.esprit.spring.control;
+import java.util.Map;
+import java.util.HashMap;
 
 import java.util.Date;
 import java.util.List;
@@ -20,8 +22,11 @@ public class UserRestControl {
 	
 	// URL : http://localhost:????/????/????/retrieve-all-users
 	@GetMapping("/retrieve-all-users")
-	public List<User> retrieveAllUsers() {
-		return userService.retrieveAllUsers();
+	public Map<String,Object> retrieveAllUsers() {
+    		Map<String,Object> m = new HashMap<>();
+    		m.put("ok", true);
+    		m.put("message", "Controller works");
+    		return m;
 		//return list;
 	}
  
