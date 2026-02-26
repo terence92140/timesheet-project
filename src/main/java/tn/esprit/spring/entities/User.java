@@ -71,7 +71,7 @@ public class User implements Serializable {
 	}
 
 	public String getLastName() {
-		return lastName;
+    		return lastName.toUpperCase();
 	}
 	public void setLastName(String lName) {
 		this.lastName = lName;

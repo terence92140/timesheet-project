@@ -22,11 +22,8 @@ public class UserRestControl {
 	
 	// URL : http://localhost:????/????/????/retrieve-all-users
 	@GetMapping("/retrieve-all-users")
-	public Map<String,Object> retrieveAllUsers() {
-    		Map<String,Object> m = new HashMap<>();
-    		m.put("ok", true);
-    		m.put("message", "Controller works");
-    		return m;
+	public List<User> retrieveAllUsers() {
+    		return userService.retrieveAllUsers();
 		//return list;
 	}
  
