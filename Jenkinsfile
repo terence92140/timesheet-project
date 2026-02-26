@@ -2,42 +2,47 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "terence92140/timesheet:1.1"
+        IMAGE_NAME = "terence92140/timesheet"
+        IMAGE_TAG  = "1.1"
+        NAMESPACE  = "chap4"
+        DEPLOYMENT = "timesheet-dep"
+        CONTAINER  = "timesheet"
     }
 
     stages {
 
-        stage('Checkout') {
+        stage('GIT') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Build Maven') {
+        stage('COMPILATION') {
             steps {
                 sh 'mvn clean package'
             }
         }
 
-        stage('Docker Build') {
+        stage('INSTALLATION') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
-            }
-        }
+                sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
 
-        stage('Docker Login') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub',
-                                                 usernameVariable: 'USER',
-                                                 passwordVariable: 'PASS')]) {
-                    sh 'echo $PASS | docker login -u $USER --password-stdin'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
                 }
+
+                sh 'docker push ${IMAGE_NAME}:${IMAGE_TAG}'
             }
         }
 
-        stage('Docker Push') {
+        stage('DEPLOIEMENT') {
             steps {
-                sh 'docker push $DOCKER_IMAGE'
+                sh 'kubectl -n ${NAMESPACE} set image deployment/${DEPLOYMENT} ${CONTAINER}=${IMAGE_NAME}:${IMAGE_TAG}'
+                sh 'kubectl -n ${NAMESPACE} rollout status deployment/${DEPLOYMENT}'
             }
         }
     }
